@@ -1,0 +1,34 @@
+todo:
+
+1. restructure performer class. needs:
+   a. twelve-voice polyphony; some number of one-pole (complex)
+      filters per voice, in harmonic (inharmonic?) series.
+      ideally, handled by a highly optimized eigen-based object
+      (benchmark: we could run filterbank with 1000 one-pole filters
+      no sweat. there's no reason this thing shouldn't be able to
+      handle 12 * 7 concurrently).
+   b. support for control-rate modulation of center frequencies
+      of these filters. idea: "snap" button which pulls currently selected
+      pitches into just tuning, then all other pitches into something rel them.
+      "unsnap" button which allows reversion to equal temperament.
+
+2. interface for modifying pitch-class sets / hierarchies
+   a. defining a hierarchy from scratch: adding and removing pitches,
+      swapping out one pitch or multiple pitches. 
+   b. changing subgroupings of pitches (maybe this is how rhythm enters the picture).
+   c. all this needs to be on a propose / confirm system.
+   d. saving and restoring hierarchy presets.
+   e. events that change the pitch collection (but not shape) may take place at any time,
+      but events that change shape must take place on a structural downbeat.
+
+3. interface for timbral modifications
+   a. mixer via radial shape! (draw polygon with fingers; convex hull determines mix)
+   b. modification of impulse characteristics, filter characteristics
+   c. potential for drone?
+
+4. interface for rhythmic variation
+   a. 
+
+5. visual aesthetics
+   a. per-voice oscilloscopes
+   b. 

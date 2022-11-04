@@ -1,0 +1,28 @@
+
+{
+	"folders":
+	[
+		{
+			"path": "bin/..",
+			"file_exclude_patterns": ["*.sublime-project"]
+		}
+	],
+
+	"build_systems":
+	[
+		{
+			"name": "Run",
+			"working_dir": "${project_path}",
+			"cmd":" ./Integers",
+			"selector": "source.c++",
+			"shell": true
+		},
+		{
+			"name": "Make & run",
+			"working_dir": "${project_path}",
+			"cmd": "make; ./Integers",
+			"selector": "source.c++",
+			"shell": true
+		}
+	]
+}

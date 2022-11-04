@@ -1,0 +1,31 @@
+
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"file_exclude_patterns": ["*.sublime-project"],
+		},
+		{
+			"path": "/Users/amc/Desktop/SDL/lib"
+		},
+	],
+
+	"build_systems":
+	[
+		{
+			"name": "Run",
+			"working_dir": "${project_path}",
+			"cmd":" ./Billiards",
+			"selector": "source.c++",
+			"shell": true,
+		},
+		{
+			"name": "Make & run",
+			"working_dir": "${project_path}",
+			"cmd": "make; ./Billiards",
+			"selector": "source.c++",
+			"shell": true,
+		}
+	],
+}
