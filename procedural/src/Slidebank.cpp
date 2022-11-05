@@ -14,24 +14,48 @@ Slidebank::~Slidebank()
 	delete out;
 }
 
-// initialize N DC-pass filters of a given order
-// then filter using response. the idea of response is to 
-// provide different radii for positive and negative changes
-Slidebank::Slidebank(int N, int order, const std::vector<CT>& radii) : N(N), back(order * N, (order + 1) * N)
+void Slidebank::create_objects()
 {
-	this->order = order = std::max(1, order);
+	rolloff = 10; // attenuate per 1000 hz
 	this->radii = new CT[N]; // one radius per filter
 
-	// back = SpMatrixCT(order * N, (order + 1) * N); // feedback is a sparse matrix
 	inputs = new VectorCT((order + 1) * N); // inputs is unrolled vector; stores history
 	out = new ArrayCT(N);
 
-	setup(radii);
-	// print();
-
 	inputs->setZero();
 	out->setZero();
+	correction = 1;
+}
 
+// initialize N DC-pass filters of a given order
+// then filter using response. the idea of response is to 
+// provide different radii for positive and negative changes
+Slidebank::Slidebank(int N, int order, const std::vector<CT>& radii) : 
+	N(N), order(std::max(1, order)), back(order * N, (order + 1) * N), correction(N)
+{
+	create_objects();
+	setup(radii);
+}
+
+Slidebank::Slidebank(int N, int order) : 
+	N(N), order(std::max(1, order)), back(order * N, (order + 1) * N), correction(N)
+{
+	create_objects();
+
+	std::vector<CT> radii(N, 0);
+	setup(radii);
+}
+
+void Slidebank::setup_correction(const std::vector<CT>& radii)
+{
+	for (int j = 0; j < N; j++)
+	{
+		T ang_freq = abs(std::arg(radii[j]) / (2 * M_PI));
+		// correction(j) = (1 - abs(radii[j])) / (1 + rolloff * ang_freq);
+		correction(j) = pow((1 - abs(radii[j])), order) / (1 + rolloff * ang_freq);
+		// correction(j) = pow((1 - abs(radii[j])), order);
+		correction(j) = 1;
+	}
 }
 
 void Slidebank::setup(const std::vector<CT>& radii)
@@ -56,6 +80,8 @@ void Slidebank::setup(const std::vector<CT>& radii)
 	}
 	back.setFromTriplets(coefficients.begin(), coefficients.end());
 	back.makeCompressed();
+
+	setup_correction(radii);
 }
 
 void Slidebank::modify(const std::vector<CT>& radii)
@@ -93,6 +119,8 @@ void Slidebank::modify(const std::vector<CT>& radii)
 			}
 		}
 	}
+
+	setup_correction(radii);
 }
 
 // get the result of filters applied to a sample
@@ -177,5 +205,6 @@ void Slidebank::compute(const ArrayCT* input)
 	(*inputs)(seq(N, Eigen::last)) = temp;
 
 	*out = (*inputs)(seqN(N + order - 1, N, order));
+	*out = correction * (*out);
 	computed = true;
 }

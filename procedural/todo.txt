@@ -37,6 +37,11 @@ x  b. support for control-rate modulation of center frequencies
    b. 
 
 
+the timbral parameters worth modulating are basically: the resonances of the filters
+and the decay times.
+
+
+
 done:
 
 1. incremental progress to making idomatic (object-oriented) the audio library. e.g.,

@@ -17,7 +17,9 @@ public:
 	// then filter using response. the idea of response is to 
 	// provide different radii for positive and negative changes
 	Slidebank(int N, int order, const std::vector<std::complex<T>>& radii);
+	Slidebank(int N, int order);
 
+	void setup();
 	void setup(const std::vector<std::complex<T>>& radii);
 	void modify(const std::vector<std::complex<T>>& radii);
 
@@ -42,8 +44,13 @@ private:
 	VectorCT* inputs;
 	ArrayCT* out;
 
+	T rolloff;
+	ArrayCT correction;
+
 	bool computed = false;
 
+	void create_objects();
+	void setup_correction(const std::vector<CT>& radii);
 	void compute(const ArrayT* input);
 	void compute(const ArrayCT* input);
 };

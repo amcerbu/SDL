@@ -13,7 +13,7 @@ public:
 	~AbstractAudio();
 	
 	static void initialize(bool report = false, int* def_in = NULL, int* def_out = NULL);
-	void args(int argc, char *argv[]);
+	virtual void args(int argc, char *argv[]);
 	virtual void startup(bool report = true);
 	virtual void startup(int in_chans, int out_chans, bool report = true, int in_device_id = -1, int out_device_id = -1);
 
