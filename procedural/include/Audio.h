@@ -9,4 +9,5 @@ class Audio : public AbstractAudio
 public:
 	using AbstractAudio::AbstractAudio;
 	int process(const float* in, float* out, unsigned long frames);
+	void prepare();
 };

@@ -1,14 +1,16 @@
 todo:
 
 1. restructure performer class. needs:
-   a. twelve-voice polyphony; some number of one-pole (complex)
+x  a. twelve-voice polyphony; some number of one-pole (complex)
       filters per voice, in harmonic (inharmonic?) series.
       ideally, handled by a highly optimized eigen-based object
       (benchmark: we could run filterbank with 1000 one-pole filters
       no sweat. there's no reason this thing shouldn't be able to
       handle 12 * 7 concurrently).
-   b. support for control-rate modulation of center frequencies
-      of these filters. idea: "snap" button which pulls currently selected
+x  b. support for control-rate modulation of center frequencies
+      of these filters. 
+   c. adjust gain of resonant filters so high != loud. 
+   d. idea: "snap" button which pulls currently selected
       pitches into just tuning, then all other pitches into something rel them.
       "unsnap" button which allows reversion to equal temperament.
 
@@ -22,7 +24,8 @@ todo:
       but events that change shape must take place on a structural downbeat.
 
 3. interface for timbral modifications
-   a. mixer via radial shape! (draw polygon with fingers; convex hull determines mix)
+   a. mixer via radial shape! (draw polygon with fingers; convex hull determines mix / timbral character)
+      i. perhaps it shouldn't be exactly 
    b. modification of impulse characteristics, filter characteristics
    c. potential for drone?
 
@@ -40,3 +43,5 @@ done:
    converted audio class into an AbstractAudio base class from which one inherits
    to define behavior
 2. progress on build system (e.g. automatic detection of m1 architecture)
+3. making slidebank modulable - jesus, that was a pain in the ass. wasted a lot of time
+   not seeing a silly bug. 

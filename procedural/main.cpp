@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
 
 	RenderWindow window("Procedural", width, height, highDPI); 
 
+	A.prepare();
 	A.startup(); // startup audio engine
 
 	bool running = true;

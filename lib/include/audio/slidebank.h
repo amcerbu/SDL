@@ -147,6 +147,18 @@ namespace soundmath
 			}
 		}
 
+		void print()
+		{
+			for (int i = 0; i < order * N; i++)
+			{
+				for (int j = 0; j < (order + 1) * N; j++)
+				{
+					std::cout << "\t" << std::real(back->coeffRef(i,j)) << " ";
+				}
+				std::cout << std::endl;
+			}
+		}
+
 	private:
 		int order;
 		std::complex<T>* radii;
@@ -172,18 +184,6 @@ namespace soundmath
 
 			*out = (*inputs)(seqN(N + order - 1, N, order));
 			computed = true;
-		}
-
-		void print()
-		{
-			for (int i = 0; i < order * N; i++)
-			{
-				for (int j = 0; j < (order + 1) * N; j++)
-				{
-					std::cout << "\t" << std::real(back->coeffRef(i,j)) << " ";
-				}
-				std::cout << std::endl;
-			}
 		}
 	};
 }
