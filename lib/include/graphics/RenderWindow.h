@@ -22,6 +22,8 @@ public:
 	void circle(float x, float y, float radius);
 	void display();
 
+	double get_scale();
+	
 	SDL_Window* sdl_window();
 	SDL_GLContext gl_context();
 

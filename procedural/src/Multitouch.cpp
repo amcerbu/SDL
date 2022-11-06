@@ -112,11 +112,16 @@ void Multitouch::tick(int screen_width, int screen_height, int width, int height
 
 		for (int i = 0; i < disks; i++)
 		{
-			for (int j = i + 1; j < disks; j++)
-			{
-				// Disk::interact(floaters[i], floaters[j], (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2, rigidity, 1.0 / oversample);
-			}
+			Disk::interact(floaters[i], floaters[(i + 1) % disks], (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2, -0.01, 1.0 / oversample);
 		}
+
+		// for (int i = 0; i < disks; i++)
+		// {
+		// 	for (int j = i + 1; j < disks; j++)
+		// 	{
+		// 		Disk::interact(floaters[i], floaters[j], (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2, rigidity, 1.0 / oversample);
+		// 	}
+		// }
 
 		for (int i = 0; i < disks; i++)
 		{
@@ -135,7 +140,7 @@ void Multitouch::tick(int screen_width, int screen_height, int width, int height
 						grabbing[i] = j;
 						Disk::pull(grabbers[i], floaters[j], bind[i], 1.0 / oversample);
 
-						targbind[i] = 0.1;
+						targbind[i] = 1;
 						grabbers[i].set_hue(basehues[j]);
 						grabbers[i].mod_color(basehues[j], excitedsat, excitedval);
 						// grabbers[i].mod_radius(bigd);
@@ -180,10 +185,39 @@ void Multitouch::tick(int screen_width, int screen_height, int width, int height
 
 void Multitouch::draw(RenderWindow* window, int screen_width, int screen_height, int width, int height)
 {
+	// for (int i = 0; i < disks; i++)
+	// {
+	// 	floaters[i].draw(window, (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2);
+	// }
+
+	double scale = window->get_scale();
+
+	float x_coords[disks];
+	float y_coords[disks];
+
+	double center_x = screen_width / 2;
+	double center_y = screen_height / 2;
+
 	for (int i = 0; i < disks; i++)
 	{
-		floaters[i].draw(window, (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2);
+		double x, y;
+		floaters[i].get_position(&x, &y);
+		x_coords[i] = scale * (center_x + width * (x - 0.5));
+		y_coords[i] = scale * (center_y + height * (y - 0.5));
 	}
+
+	SDL_Vertex points[disks * 3];
+	Color color;
+	color.hsva(0, 0, 1, 0.25);
+
+	for (int j = 0; j < disks; j++)
+	{
+		points[3 * j] = { SDL_FPoint{ x_coords[j], y_coords[j] }, color.raw(), SDL_FPoint{ 0 } };
+		points[3 * j + 1] = { SDL_FPoint{ x_coords[(j + 1) % disks], y_coords[(j + 1) % disks] }, color.raw(), SDL_FPoint{ 0 } };
+		points[3 * j + 2] = { SDL_FPoint{ float(scale * center_x), float(scale * center_y) }, color.raw(), SDL_FPoint{ 0 } };
+	}
+
+	window->geometry(points, disks * 3);
 
 	for (int i = 0; i < fingers; i++)
 	{

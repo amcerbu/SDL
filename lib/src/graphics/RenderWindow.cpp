@@ -154,3 +154,8 @@ SDL_GLContext RenderWindow::gl_context()
 {
 	return context;
 }
+
+double RenderWindow::get_scale()
+{
+	return scale;
+}

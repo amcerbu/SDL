@@ -7,8 +7,9 @@
 
 const int width = 800;
 const int height = 800;
-const bool highDPI = true;
+const bool highDPI = false;
 bool fullscreen = false;
+bool mouse = true;
 
 const int bsize = 64;
 
@@ -69,6 +70,17 @@ int main(int argc, char* argv[])
 
 					screen_width = fullscreen ? DM.w : width;
 					screen_height = fullscreen ? DM.h : height;
+				}
+
+				if (event.key.keysym.sym == SDLK_m)
+				{
+					mouse = !mouse;
+					if (mouse)
+					{
+						SDL_SetRelativeMouseMode(SDL_FALSE);
+					}
+					else
+						SDL_SetRelativeMouseMode(SDL_TRUE);
 				}
 			}
 
