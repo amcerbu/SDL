@@ -29,7 +29,9 @@ double darkness = 0.5; // rolloff of high overtones
 const int filter_order = 1;
 Performer p(n, overtones, transp, def_ringing, def_attack, def_decay, darkness, filter_order);
 
-Metro<double> metro(10); 
+bool toggler = false;
+double metro_tempo = 10;
+Metro<double> metro(toggler * metro_tempo); 
 Noise<double> noise;
 Score score("score1.txt");
 ArrayT chord(n);
@@ -76,16 +78,14 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 			p.modulate();
 		}
 		
-		ArrayT decays(n);
-		ArrayT ringings(n);
-		for (int j = 0; j < n; j++)
-		{
-			T t = (1 + sin(2 * M_PI * (lfo()) * (double)j / n)) / 2;
-			decays(j) = t * 0.1 + (1 - t) * 0.0001;
-			ringings(j) = (1 - t) * 0.1 + (t) * 100;
-		}
-		p.mod_decay(&decays);
-		p.mod_ringing(&ringings);
+		// for (int j = 0; j < n; j++)
+		// {
+		// 	T t = (1 + sin(2 * M_PI * (lfo()) * (double)j / n)) / 2;
+		// 	decays(j) = t * 0.1 + (1 - t) * 0.0001;
+		// 	ringings(j) = (1 - t) * 0.1 + (t) * 100;
+		// }
+
+		
 
 		ArrayCT input = metro() * chord;
 		ArrayT clipping = p.impulse(&input)->imag();
@@ -100,6 +100,8 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 		{
 			out[out_offset + j + i * out_chans] = distributed(j) * headroom;
 		}
+
+		metro.freqmod(toggler * metro_tempo);
 
 		p.tick();
 		metro.tick();
@@ -180,7 +182,27 @@ void Audio::prepare()
 
 void Audio::graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius)
 {
+	ArrayT decays(n);
+	ArrayT ringings(n);
+
+	controller->set_decays(&decays, n);
+	controller->set_ringing(&ringings, n);
+
+	p.mod_decay(&decays);
+	p.mod_ringing(&ringings);
+
+
 	p.graphics(window, screen_width, screen_height, draw_width, draw_height, radius, radius / 3);
+}
+
+void Audio::tempo(T scale)
+{
+	metro_tempo *= scale;
+}
+
+void Audio::toggle()
+{
+	toggler = !toggler;
 }
 
 void Audio::scope(RenderWindow* window)
@@ -297,4 +319,10 @@ void Audio::args(int argc, char *argv[])
 	{
 		std::exit(1);
 	}
+}
+
+
+void Audio::bind(Multitouch* controller)
+{
+	this->controller = controller;
 }

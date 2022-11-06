@@ -208,7 +208,7 @@ void Multitouch::draw(RenderWindow* window, int screen_width, int screen_height,
 
 	SDL_Vertex points[disks * 3];
 	Color color;
-	color.hsva(0, 0, 1, 0.25);
+	color.hsva(0, 0, 1, 1.0 / 3);
 
 	for (int j = 0; j < disks; j++)
 	{
@@ -225,5 +225,35 @@ void Multitouch::draw(RenderWindow* window, int screen_width, int screen_height,
 		{
 			grabbers[i].draw(window, (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2);
 		}
+	}
+}
+
+void Multitouch::set_decays(ArrayT* decays, int n)
+{
+	for (int j = 0; j < n; j++)
+	{
+		double x, y;
+		floaters[j].get_position(&x, &y);
+		x -= 0.5;
+		y -= 0.5;
+
+		T t = 10 * sqrt(x * x + y * y);
+
+		(*decays)(j) = t * 0.1 + (1 - t) * 0.0001;
+	}
+}
+
+void Multitouch::set_ringing(ArrayT* ringings, int n)
+{
+	for (int j = 0; j < n; j++)
+	{
+		double x, y;
+		floaters[j].get_position(&x, &y);
+		x -= 0.5;
+		y -= 0.5;
+
+		T t = 10 * sqrt(x * x + y * y);
+
+		(*ringings)(j) = (1 - t) * 0.1 + (t) * 500;
 	}
 }

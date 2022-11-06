@@ -22,6 +22,7 @@ int main(int argc, char* argv[])
 	A.args(argc, argv);
 
 	M.setup();
+	A.bind(&M);
 
 	if (SDL_Init(SDL_INIT_VIDEO) > 0)
 	{
@@ -82,6 +83,30 @@ int main(int argc, char* argv[])
 					else
 						SDL_SetRelativeMouseMode(SDL_TRUE);
 				}
+
+				if (event.key.keysym.sym == SDLK_UP)
+				{
+					A.tempo(3.0 / 2);
+				}
+				if (event.key.keysym.sym == SDLK_DOWN)
+				{
+					A.tempo(2.0 / 3);
+				}
+
+				if (event.key.keysym.sym == SDLK_LEFT)
+				{
+					A.tempo(4.0 / 3);
+				}
+				if (event.key.keysym.sym == SDLK_RIGHT)
+				{
+					A.tempo(3.0 / 4);
+				}
+
+				if (event.key.keysym.sym == SDLK_SPACE)
+				{
+					A.toggle();
+				}
+				
 			}
 
 			M.process_event(event);

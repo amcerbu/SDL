@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "Disk.h"
 #include "RenderWindow.h"
+#include "EigenTypes.h"
 
 class Multitouch
 {
@@ -13,6 +14,9 @@ public:
 
 	void tick(int screen_width, int screen_height, int width, int height);
 	void draw(RenderWindow* window, int screen_width, int screen_height, int width, int height);
+
+	void set_decays(ArrayT* decays, int n);
+	void set_ringing(ArrayT* ringing, int n);
 
 private:
 	const double radius = 30;
