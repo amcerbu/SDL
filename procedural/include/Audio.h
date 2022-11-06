@@ -19,4 +19,5 @@ public:
 
 private:
 	double gain, headroom, ringing, attack, decay;
+	int out_offset;
 };

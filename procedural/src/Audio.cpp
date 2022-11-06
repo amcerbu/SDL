@@ -97,7 +97,7 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 		ArrayT distributed = mix * output.matrix();
 		for (int j = 0; j < out_chans; j++)
 		{
-			out[j + i * out_chans] = distributed(j) * headroom;
+			out[out_offset + j + i * out_chans] = distributed(j) * headroom;
 		}
 
 		p.tick();
@@ -207,7 +207,7 @@ void Audio::args(int argc, char *argv[])
 		.scan<'i', int>()
 		.help("channels per frame of input");
 
-	program.add_argument("-c", "--channel")
+	program.add_argument("-ic", "--in_channel")
 		.default_value<int>(0)
 		.required()
 		.scan<'i', int>()
@@ -224,6 +224,13 @@ void Audio::args(int argc, char *argv[])
 		.required()
 		.scan<'i', int>()
 		.help("channels per frame of output");
+
+	program.add_argument("-oc", "--out_channel")
+		.default_value<int>(0)
+		.required()
+		.scan<'i', int>()
+		.help("channel offset for output");
+
 
 	program.add_argument("-d", "--devices")
 		.help("list audio device names and exits")
@@ -276,6 +283,7 @@ void Audio::args(int argc, char *argv[])
 	in_channel = program.get<int>("-c");
 	out_device = program.get<int>("-o");
 	out_chans = program.get<int>("-of");
+	this->out_offset = program.get<int>("-oc");
 	this->gain = program.get<double>("-g");
 	this->headroom = program.get<double>("-h");
 	this->ringing = program.get<double>("-r");
