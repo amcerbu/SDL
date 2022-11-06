@@ -11,10 +11,14 @@
 #include "filter.h"
 #include "metro.h"
 
+int screen_width;
+int screen_height;
 const int width = 800;
 const int height = 800;
 const bool highDPI = true;
 const double correction = (highDPI ? 1 : 0.5);
+bool fullscreen = false;
+bool mouse = true;
 
 #define DARKNESS 255
 #define ALPHA 64
@@ -87,8 +91,8 @@ inline int process(const float* in, float* out)
 		double the_sample = in[in_chans * i + in_channel];
 		waveform[waveOrigin + waveSize * flipped] = 
 			SDL_FPoint{
-				float((1 + highDPI) * (1 + gain * the_sample) / 2 * width),
-				float((1 + highDPI) * (1 + gain * chandelay(the_sample)) / 2 * height)
+				float((1 + highDPI) * (1 + gain * the_sample) / 2 * screen_width),
+				float((1 + highDPI) * (1 + gain * chandelay(the_sample)) / 2 * screen_height)
 			};
 
 		waveOrigin--;
@@ -197,7 +201,12 @@ int main(int argc, char* argv[])
 		std::cout << "SDL_Init has failed. SDL_ERROR: " << SDL_GetError() << std::endl;
 	}
 
-	RenderWindow window("Oscilloscope", width, height, highDPI); 
+	SDL_DisplayMode DM;
+	SDL_GetCurrentDisplayMode(0, &DM);
+	screen_width = fullscreen ? DM.w : width;
+	screen_height = fullscreen ? DM.h : height;
+
+	RenderWindow window("Oscilloscope", screen_width, screen_height, highDPI, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); 
 	// window.blend(SDL_BLENDMODE_ADD);
 
 	A.startup(in_chans, out_chans, true, in_device, out_device); // startup audio engine
@@ -238,6 +247,32 @@ int main(int argc, char* argv[])
 				{
 					gain += 0.05;
 				}
+
+				if (event.key.keysym.sym == SDLK_f)
+				{
+					fullscreen = !fullscreen;
+					if (fullscreen)
+						SDL_SetWindowFullscreen(window.sdl_window(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+					else
+						SDL_SetWindowFullscreen(window.sdl_window(), 0);
+
+					SDL_GetCurrentDisplayMode(0, &DM);
+
+					screen_width = fullscreen ? DM.w : width;
+					screen_height = fullscreen ? DM.h : height;
+				}
+
+				if (event.key.keysym.sym == SDLK_m)
+				{
+					mouse = !mouse;
+					if (mouse)
+					{
+						SDL_SetRelativeMouseMode(SDL_FALSE);
+					}
+					else
+						SDL_SetRelativeMouseMode(SDL_TRUE);
+				}
+
 			}
 		}
 
