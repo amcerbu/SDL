@@ -12,7 +12,7 @@ const bool highDPI = true;
 const double correction = (highDPI ? 1 : 0.5);
 const double PI = 245850922.0 / 78256779.0;
 const double fillalpha = 0.875;
-const double colormod = 12;
+const double colormod = 32;
 
 SDL_Rect fill = { 0, 0, (int)(width * 2 * correction), (int)(height * 2 * correction) };
 
@@ -26,7 +26,7 @@ SDL_BlendMode polyblend = SDL_BLENDMODE_ADD;
 // 	SDL_BLENDOPERATION_MINIMUM);
 
 const int oversample = 1024;
-const number stiffness = 1;
+const number stiffness = 4;
 const bool rigid = false;
 
 const number radius = width / 6;
@@ -85,8 +85,8 @@ void init()
 
 			x_centers[index] = radius / (2 * overlap) + radius * i / overlap;
 			y_centers[index] = radius / (2 * overlap) + radius * j / overlap;
-			x_vels[index] = (y_balls - 1 - j) * radius / 32;
-			y_vels[index] = i * radius / 32;
+			x_vels[index] = (y_balls - 1 - j) * radius / 64;
+			y_vels[index] = i * radius / 64;
 
 			x_avg += x_vels[index];
 			y_avg += y_vels[index];
@@ -94,6 +94,10 @@ void init()
 			hues[index] = 0;
 			saturations[index] = 2.0 / 3;
 			values[index] = 1.0 / 3;
+
+			// hues[index] = 0.5;
+			// saturations[index] = 0.5;
+			// values[index] = 0.0625;
 		}
 	}
 
@@ -153,14 +157,8 @@ void collisions(number step = 1)
 			}
 
 			number repulsion = (radius * buffer) * (radius * buffer) - dist;
-			// repulsion = sqrt(clip(repulsion / radius));
 			repulsion /= radius * radius;
 			repulsion *= step * (repulsion > 0);
-
-			// x_accs[i] += -stiffness * repulsion * dx / sqrt(dist);
-			// y_accs[i] += -stiffness * repulsion * dy / sqrt(dist);
-			// x_accs[j] += stiffness * repulsion * dx / sqrt(dist);
-			// y_accs[j] += stiffness * repulsion * dy / sqrt(dist);	
 
 			if (repulsion > 0)
 			{
@@ -275,12 +273,20 @@ void draw(RenderWindow* window)
 			{
 				double hue = hues[i] + (i ? l / (colormod) + k / (colormod) : 0);
 				hue = fmod(hue + 1, 1);
+
+				double R, G, B;
+				R = (values[i] + 1 + sin(2 * PI * (0.0 / 3 * saturations[i] + hue))) / (values[i] + 2);
+				G = (values[i] + 1 + sin(2 * PI * (1.0 / 3 * saturations[i] + hue))) / (values[i] + 2);
+				B = (values[i] + 1 + sin(2 * PI * (2.0 / 3 * saturations[i] + hue))) / (values[i] + 2);
+
 				color.hsva(hue, saturations[i], values[i], fillalpha);
 				window->color(color);
+				// window->color(R, G, B, fillalpha);
+				// window->color(1, 1, 1, 1);
 				window->circle((x + l * width / tiles), (y + k * height / tiles), 0.5 * (radius / tiles));
 				// circle(window, 
-				// 	x + l * 2 * width / tiles, 
-				// 	y + k * 2 * height / tiles, 
+				// 	x + l * width / tiles, 
+				// 	y + k * height / tiles, 
 				// 	radius / tiles, 
 				// 	hue, saturations[i], values[i]);
 			}

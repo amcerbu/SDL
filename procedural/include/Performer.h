@@ -17,11 +17,15 @@ public:
 	void set_notes(const ArrayT* notes, const ArrayT* octaves);
 	void set_envelope(T attack, T decay);
 	void set_ringing(T ringing);
+
+	void mod_decay(ArrayT* decay);
+	void mod_ringing(ArrayT* ringing);
 	void modulate();
+
 	const ArrayCT* impulse(const ArrayCT* input);
 	const ArrayCT* operator()(const ArrayCT* input);
 	void tick();
-	void graphics(RenderWindow* window, int width, int height, double radius, double growth);
+	void graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius, double growth);
 	void scope(RenderWindow* window);
 
 private:
@@ -29,7 +33,7 @@ private:
 	Noise<T> excitation;
 
 	int n, overtones, transp;
-	T ringing;
+	ArrayT ringing;
 	T darkness;
 	CT correction;
 

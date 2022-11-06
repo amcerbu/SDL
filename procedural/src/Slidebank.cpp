@@ -16,7 +16,7 @@ Slidebank::~Slidebank()
 
 void Slidebank::create_objects()
 {
-	rolloff = 10; // attenuate per 1000 hz
+	rolloff = 100; // attenuate per 1000 hz
 	this->radii = new CT[N]; // one radius per filter
 
 	inputs = new VectorCT((order + 1) * N); // inputs is unrolled vector; stores history

@@ -15,7 +15,7 @@ SDL_Rect fill = { 0, 0, (int)(width * 2 * correction), (int)(height * 2 * correc
 
 SDL_BlendMode polyblend = SDL_BLENDMODE_ADD;
 
-const double radius = width / 3;
+const double radius = width / 5;
 const double overlap = 1; // spacing of initialized balls
 const int x_balls = overlap * width / radius;
 const int y_balls = overlap * height / radius;

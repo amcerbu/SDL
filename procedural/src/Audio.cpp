@@ -4,6 +4,7 @@
 #include "Score.h"
 #include "metro.h"
 #include "noise.h"
+#include "synth.h"
 #include "argparse.h"
 
 using namespace soundmath;
@@ -25,7 +26,7 @@ const int overtones = 5;
 const int transp = 36;
 // ringing. 1: windy. 10 <== much louder!: 
 double darkness = 0.5; // rolloff of high overtones
-const int filter_order = 2;
+const int filter_order = 1;
 Performer p(n, overtones, transp, def_ringing, def_attack, def_decay, darkness, filter_order);
 
 Metro<double> metro(10); 
@@ -33,6 +34,8 @@ Noise<double> noise;
 Score score("score1.txt");
 ArrayT chord(n);
 ArrayT octaves(n);
+
+Synth<double> lfo(&cycle, 0.05);
 
 const double width = 0.0125; // setting this to 12 gives mono
 const int convolutions = 5; // setting this to 12 gives mono
@@ -49,6 +52,61 @@ void Audio::defaults()
 	ringing = def_ringing;
 	attack = def_attack;
 	decay = def_decay;
+}
+
+int Audio::process(const float* in, float* out, unsigned long frames)
+{
+	for (int i = 0; i < frames; i++)
+	{
+		if (metro())
+		{
+			std::vector<int> notes = score.read();
+			std::vector<T> loader(n, 0);
+			chord.setZero();
+			octaves.setZero();
+			for (int a : notes)
+			{
+				loader[a % n] = a;
+				chord(a % n) = 1;
+				octaves(a % n) = (a - a % n) / n;
+			}
+
+			p.set_notes(&chord, &octaves);
+			p.modulate();
+		}
+		
+		ArrayT decays(n);
+		ArrayT ringings(n);
+		for (int j = 0; j < n; j++)
+		{
+			T t = (1 + sin(2 * M_PI * (lfo()) * (double)j / n)) / 2;
+			decays(j) = t * 0.1 + (1 - t) * 0.0001;
+			ringings(j) = (1 - t) * 0.1 + (t) * 100;
+		}
+		p.mod_decay(&decays);
+		p.mod_ringing(&ringings);
+
+		ArrayCT input = metro() * chord;
+		ArrayT clipping = p.impulse(&input)->imag();
+		ArrayT output = gain * clipping.unaryExpr(distortion);
+		// ArrayCT input = noise() * chord;
+		// ArrayCT output = *p(&input);
+
+		
+		// distribute voices across channels
+		ArrayT distributed = mix * output.matrix();
+		for (int j = 0; j < out_chans; j++)
+		{
+			out[j + i * out_chans] = distributed(j) * headroom;
+		}
+
+		p.tick();
+		metro.tick();
+		lfo.tick();
+		noise.tick();
+	}
+
+	return 0;
 }
 
 void Audio::prepare()
@@ -119,51 +177,9 @@ void Audio::prepare()
 	p.set_ringing(ringing);
 }
 
-int Audio::process(const float* in, float* out, unsigned long frames)
+void Audio::graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius)
 {
-	for (int i = 0; i < frames; i++)
-	{
-		if (metro())
-		{
-			std::vector<int> notes = score.read();
-			std::vector<T> loader(n, 0);
-			chord.setZero();
-			octaves.setZero();
-			for (int a : notes)
-			{
-				loader[a % n] = a;
-				chord(a % n) = 1;
-				octaves(a % n) = (a - a % n) / n;
-			}
-
-			p.set_notes(&chord, &octaves);
-			p.modulate();
-		}
-		ArrayCT input = metro() * chord;
-		ArrayT clipping = p.impulse(&input)->imag();
-		ArrayT output = gain * clipping.unaryExpr(distortion);
-		// ArrayCT input = noise() * chord;
-		// ArrayCT output = *p(&input);
-
-		// distribute voices across channels
-		ArrayT distributed = mix * output.matrix();
-		for (int j = 0; j < out_chans; j++)
-		{
-			out[j + i * out_chans] = distributed(j) * headroom;
-		}
-
-		p.tick();
-		metro.tick();
-		noise.tick();
-	}
-
-	return 0;
-}
-
-
-void Audio::graphics(RenderWindow* window, int width, int height, double radius)
-{
-	p.graphics(window, width, height, radius, radius / 3);
+	p.graphics(window, screen_width, screen_height, draw_width, draw_height, radius, radius / 3);
 }
 
 void Audio::scope(RenderWindow* window)

@@ -14,7 +14,7 @@ public:
 	void prepare();
 	void defaults();
 
-	void graphics(RenderWindow* window, int width, int height, double radius);
+	void graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius);
 	void scope(RenderWindow* window);
 
 private:

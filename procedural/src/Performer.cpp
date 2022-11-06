@@ -45,14 +45,27 @@ void Performer::set_ringing(T ringing)
 }
 
 
+void Performer::mod_decay(ArrayT* decay)
+{
+	decay_times = *decay;
+	this->decays = relax(decay_times, SR);
+	setup_envelopes();
+}
+
+void Performer::mod_ringing(ArrayT* ringing)
+{
+	this->ringing = *ringing;
+}
+
 Performer::Performer(int n, int overtones, int transp, T ringing, T attack, T decay, T darkness, int order, T thresh) : 
 	slidebank(n * overtones, order), darkness(darkness),
-	n(n), overtones(overtones), transp(transp), ringing(ringing), loading(n),
+	n(n), overtones(overtones), transp(transp), ringing(n), loading(n),
 	envelopes(n), attacks(n), decays(n), env_thresh(n), env_correction(n),
 	attack_times(n), decay_times(n)
 {
 	out = new ArrayCT(n);
 
+	this->ringing = ringing;
 	loading = false;
 	envelopes.setZero();
 	attack_times = attack;
@@ -104,8 +117,8 @@ void Performer::modulate()
 		{
 			T freq = mtof(i + n * octaves(i) + transp) * (1 + j);
 			T theta = 2 * PI * freq / SR;
-			T rad = relax(ringing / freq, SR);
-			// T rad = relax(ringing, SR);
+			T rad = relax(ringing(i) / freq, SR);
+			// T rad = relax(ringing(i), SR);
 			radii[j + i * overtones] = CT(rad * cos(theta), rad * sin(theta));
 		}
 	}
@@ -152,7 +165,7 @@ void Performer::tick()
 	slidebank.tick();
 }
 
-void Performer::graphics(RenderWindow* window, int width, int height, double radius, double growth)
+void Performer::graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius, double growth)
 {
 	double smooth = relax(3.0 / 60, 60);
 	ball_radii = smooth * ball_radii + (1 - smooth) * notes;
@@ -160,8 +173,8 @@ void Performer::graphics(RenderWindow* window, int width, int height, double rad
 
 	for (int i = 0; i < n; i++)
 	{
-		double x = (width / 2 + (1 + 0.25 * ball_values(i)) * width / 4 * cos(2 * M_PI * (double) i / n));
-		double y = (width / 2 + (1 + 0.25 * ball_values(i)) * width / 4 * sin(2 * M_PI * (double) i / n));
+		double x = (screen_width / 2 + (1 + 0.25 * ball_values(i)) * draw_width / 4 * sin(2 * M_PI * (double) i / n));
+		double y = (screen_height / 2 - (1 + 0.25 * ball_values(i)) * draw_height / 4 * cos(2 * M_PI * (double) i / n));
 		Color color;
 		color.hsva((double)i / n, 2.0 / 3, 1.0 / 3 + 1.0 / 6 * ball_values(i), 0.75);
 

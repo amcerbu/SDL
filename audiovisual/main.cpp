@@ -166,13 +166,13 @@ int main(int argc, char* argv[])
 				{
 					fullscreen = !fullscreen;
 					if (fullscreen)
-			            SDL_SetWindowFullscreen(window.sdl_window(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+						SDL_SetWindowFullscreen(window.sdl_window(), SDL_WINDOW_FULLSCREEN_DESKTOP);
 					else
-			            SDL_SetWindowFullscreen(window.sdl_window(), 0);
+						SDL_SetWindowFullscreen(window.sdl_window(), 0);
 
-			        SDL_GetCurrentDisplayMode(0, &DM);
+					SDL_GetCurrentDisplayMode(0, &DM);
 
-			        screen_width = fullscreen ? DM.w : width;
+					screen_width = fullscreen ? DM.w : width;
 					screen_height = fullscreen ? DM.h : height;
 				}
 			}

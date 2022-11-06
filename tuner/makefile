@@ -1,20 +1,37 @@
 target = Tuner
 
-LIBS = -lSDL2 -lSDL2_image -lm -lfftw3 -lportaudio -lncurses -lrtmidi
-CFLAGS = -std=c++17 -Ofast
-INC = -I ./include -I ../lib/include/graphics -I ../lib/include/audio -I ../lib/include/common \
-	  -I /usr/local/include/eigen3 -I /usr/local/include/rtmidi
+# grab system info
+uname_s := $(shell uname -s)
+uname_m := $(shell uname -m)
+# $(info uname_s=$(uname_s))
+# $(info uname_m=$(uname_m))
 
-objects = main.o \
-		  $(patsubst %.cpp, %.o, $(wildcard ../lib/src/graphics/*.cpp)) \
-		  $(patsubst %.cpp, %.o, $(wildcard ../lib/src/audio/*.cpp)) \
-		  $(patsubst %.cpp, %.o, $(wildcard ../lib/src/common/*.cpp)) \
-		  $(patsubst %.cpp, %.o, $(wildcard ./src/*.cpp))
+# system specific variables, add more here
+INCDIR.Darwin.x86_64 := -I /usr/local/include/eigen3 -I /usr/local/include/rtmidi
+LINKDIR.Darwin.x86_64 := 
 
-rebuildables = $(objects) $(target)
+INCDIR.Darwin.arm64 := -I /opt/homebrew/include -I /opt/homebrew/include/eigen3 -I /opt/homebrew/include/rtmidi
+LINKDIR.Darwin.arm64 := -L /opt/homebrew/lib
 
-$(target): $(objects)
-	g++ -o $(target) $(objects) $(LIBS) $(CFLAGS)
+INCDIR += $(INCDIR.$(uname_s).$(uname_m))
+LINKDIR += $(LINKDIR.$(uname_s).$(uname_m))
+
+# $(info INCDIR=$(INCDIR))
+# $(info LINKDIR=$(LINKDIR))
+
+LIBS = $(LINKDIR) -lSDL2 -lSDL2_image -lm -lfftw3 -lportaudio -lrtmidi
+CFLAGS = -std=c++17 -O3
+INC = -I ./include -I ../lib/include/graphics -I ../lib/include/audio $(INCDIR)
+
+priv_objects = main.o $(patsubst %.cpp, %.o, $(wildcard ./src/*.cpp))
+
+lib_objects  = $(patsubst %.cpp, %.o, $(wildcard ../lib/src/graphics/*.cpp)) \
+			   $(patsubst %.cpp, %.o, $(wildcard ../lib/src/audio/*.cpp))
+
+rebuildables = $(priv_objects) $(target)
+
+$(target): $(priv_objects) $(lib_objects)
+	g++ -o $(target) $(priv_objects) $(lib_objects) $(LIBS) $(CFLAGS)
 
 %.o: %.cpp
 	g++ -o $@ -c $< $(CFLAGS) $(INC)
@@ -22,3 +39,6 @@ $(target): $(objects)
 .PHONEY:
 clean:
 	rm $(rebuildables)
+
+cleanall:
+	rm $(rebuildables) $(lib_objects)
