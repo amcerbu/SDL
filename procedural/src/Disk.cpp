@@ -198,6 +198,17 @@ void Disk::pull(Disk& guide, Disk& follower, double attraction, double dt)
 	follower.y += dt * attraction * dy;
 }
 
+void Disk::suggest(Disk& guide, Disk& follower, double attraction, double dt)
+{
+	double dx = guide.x - follower.x;
+	double dy = guide.y - follower.y;
+
+	// follower.vx = 0; 
+	// follower.vy = 0; 
+	follower.x += dt * attraction * dx;
+	follower.y += dt * attraction * dy;
+}
+
 bool Disk::close(Disk& first, Disk& second, double left, double right, double top, double bottom)
 {
 	double dx = first.x - second.x;

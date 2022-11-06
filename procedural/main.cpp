@@ -8,8 +8,8 @@
 const int width = 800;
 const int height = 800;
 const bool highDPI = false;
-bool fullscreen = false;
-bool mouse = true;
+bool fullscreen = true;
+bool mouse = false;
 
 const int bsize = 64;
 
@@ -38,6 +38,13 @@ int main(int argc, char* argv[])
 
 	RenderWindow window("Hierarchy", screen_width, screen_height, highDPI, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); 
 	// RenderWindow window2("Scope", width, height, highDPI); 
+
+	if (mouse)
+	{
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+	}
+	else
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	A.prepare();
 	A.startup(); // startup audio engine
@@ -93,11 +100,11 @@ int main(int argc, char* argv[])
 					A.tempo(2.0 / 3);
 				}
 
-				if (event.key.keysym.sym == SDLK_LEFT)
+				if (event.key.keysym.sym == SDLK_RIGHT)
 				{
 					A.tempo(4.0 / 3);
 				}
-				if (event.key.keysym.sym == SDLK_RIGHT)
+				if (event.key.keysym.sym == SDLK_LEFT)
 				{
 					A.tempo(3.0 / 4);
 				}

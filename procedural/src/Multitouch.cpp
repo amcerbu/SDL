@@ -112,7 +112,8 @@ void Multitouch::tick(int screen_width, int screen_height, int width, int height
 
 		for (int i = 0; i < disks; i++)
 		{
-			Disk::interact(floaters[i], floaters[(i + 1) % disks], (screen_width - width) / 2, width + (screen_width - width) / 2, (screen_height - height) / 2, height + (screen_height - height) / 2, -0.01, 1.0 / oversample);
+			Disk::suggest(floaters[i], floaters[(i + 1) % disks], 0.05, 1.0 / oversample);
+			Disk::suggest(floaters[i], floaters[(disks + i - 1) % disks],  0.05, 1.0 / oversample);
 		}
 
 		// for (int i = 0; i < disks; i++)
@@ -252,8 +253,8 @@ void Multitouch::set_ringing(ArrayT* ringings, int n)
 		x -= 0.5;
 		y -= 0.5;
 
-		T t = 10 * sqrt(x * x + y * y);
+		T t = 3 * sqrt(x * x + y * y);
 
-		(*ringings)(j) = (1 - t) * 0.1 + (t) * 500;
+		(*ringings)(j) = (1 - t) * 0.1 + t * 100;
 	}
 }

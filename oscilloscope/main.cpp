@@ -17,8 +17,8 @@ const int width = 800;
 const int height = 800;
 const bool highDPI = true;
 const double correction = (highDPI ? 1 : 0.5);
-bool fullscreen = false;
-bool mouse = true;
+bool fullscreen = true;
+bool mouse = false;
 
 #define DARKNESS 255
 #define ALPHA 64
@@ -209,6 +209,13 @@ int main(int argc, char* argv[])
 	RenderWindow window("Oscilloscope", screen_width, screen_height, highDPI, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); 
 	// window.blend(SDL_BLENDMODE_ADD);
 
+	if (mouse)
+	{
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+	}
+	else
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+	
 	A.startup(in_chans, out_chans, true, in_device, out_device); // startup audio engine
 
 	bool running = true;

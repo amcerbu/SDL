@@ -28,6 +28,7 @@ public:
 	static double distance(Disk first, Disk second);
 	static void interact(Disk& first, Disk& second, double left, double right, double top, double bottom, double repulsion, double dt = 1);
 	static void pull(Disk& guide, Disk& follower, double attraction, double dt = 1);
+	static void suggest(Disk& guide, Disk& follower, double attraction, double dt = 1);
 	static bool close(Disk& first, Disk& second, double left, double right, double top, double bottom);
 	
 	void constrain(double x, double y, double vx, double vy, double attraction, double push, double dt = 1);
