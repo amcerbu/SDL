@@ -52,6 +52,7 @@ void Audio::defaults()
 	ringing = def_ringing;
 	attack = def_attack;
 	decay = def_decay;
+	out_offset = 0;
 }
 
 int Audio::process(const float* in, float* out, unsigned long frames)
@@ -280,7 +281,7 @@ void Audio::args(int argc, char *argv[])
 
 	in_device = program.get<int>("-i");
 	in_chans = program.get<int>("-if");
-	in_channel = program.get<int>("-c");
+	in_channel = program.get<int>("-ic");
 	out_device = program.get<int>("-o");
 	out_chans = program.get<int>("-of");
 	this->out_offset = program.get<int>("-oc");
