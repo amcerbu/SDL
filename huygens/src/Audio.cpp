@@ -11,7 +11,7 @@ using namespace soundmath;
 
 const double def_gain = 0.5;
 const double def_headroom = 0.5;
-const double def_ringing = 100;
+const double def_ringing = 10;
 const double def_attack = 0.001;
 const double def_decay = 1;
 
@@ -22,30 +22,48 @@ const double def_decay = 1;
 // decay = def_decay;
 
 const int n = 12;
-const int overtones = 9;
+const int overtones = 7;
 const int transp = 36;
 // ringing. 1: windy. 10 <== much louder!: 
-double darkness = 0.1; // rolloff of high overtones
+double darkness = 0.25; // rolloff of high overtones
 const int filter_order = 1;
 Performer p(n, overtones, transp, def_ringing, def_attack, def_decay, darkness, filter_order);
 
 bool toggler = true;
-double metro_tempo = 10;
+double metro_tempo = 1;
 Metro<double> metro(toggler * metro_tempo); 
 Noise<double> noise;
 Score score("score1.txt");
+std::vector<int> notes;
 ArrayT chord(n);
-ArrayT octaves(n);
+ArrayT pitches(n);
 
-Synth<double> lfo(&cycle, 0.05);
+Synth<double> lfo(&cycle, 1);
 
-const double width = 0.0125; // setting this to 12 gives mono
-const int convolutions = 5; // setting this to 12 gives mono
+const bool print_matrices = true;
+const double width = 0.00625; // setting this to 12 gives mono
+const int convolutions = 5; // 
 MatrixT kernel(n, n);
 MatrixT projection;
 MatrixT mix;
 
+int sgn(T x)
+{
+	return (x >= 0) - (x <= 0);
+}
+
+T softclip(T sample, T width = 0.5)
+{
+	if (abs(sample) < width)
+		return sample;
+
+	int sign = sgn(sample);
+	T gap = sample - sign * width;
+	return sign * width + (1 - width) * std::tanh(gap / (1 - width));
+}
+
 T (*distortion)(T in) = std::tanh;
+// T (*distortion)(T in) = softclip;
 
 void Audio::defaults()
 {
@@ -63,47 +81,32 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 	{
 		if (metro())
 		{
-			std::vector<int> notes = score.read();
+			// notes = score.read();
+		}
 			std::vector<T> loader(n, 0);
 			chord.setZero();
-			octaves.setZero();
+			pitches.setZero();
 			for (int a : notes)
 			{
 				loader[a % n] = a;
 				chord(a % n) = 1;
-				octaves(a % n) = (a - a % n) / n;
+				pitches(a % n) = a + 0.25 * lfo();
 			}
-			
-			p.set_notes(&chord, &octaves);
+
+		if (false)
+		{
+			p.set_notes(&chord, &pitches);
 			p.modulate();
 		}
 
 		if (metro() || toggler)
 			metro.freqmod(toggler * metro_tempo);
 
-		// ArrayT decays(n);
-		// ArrayT ringings(n);
-
-		
-		// for (int j = 0; j < n; j++)
-		// {
-		// 	T t = (1 + sin(2 * M_PI * (lfo()) * (double)j / n)) / 2;
-		// 	decays(j) = t * 0.01 + (1 - t) * 0.0001;
-		// 	ringings(j) = (1 - t) * 1 + (t) * 100;
-		// }
-
-		// // p.mod_decay(&decays);
-		// p.mod_ringing(&ringings);
-
-
-		
-
 		ArrayCT input = metro() * chord;
+		// ArrayCT input = chord;
 		ArrayT clipping = p.impulse(&input)->real();
-		ArrayT output = gain * clipping.unaryExpr(distortion);
-		// ArrayCT input = noise() * chord;
-		// ArrayCT output = *p(&input);
-
+		// ArrayT output = gain * clipping.unaryExpr([](T x) { return softclip(x, 0.99); });
+		ArrayT output = gain * clipping;
 		
 		// distribute voices across channels
 		ArrayT distributed = mix * output.matrix();
@@ -111,8 +114,6 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 		{
 			out[out_offset + j + i * out_chans] = distributed(j) * headroom;
 		}
-
-		// metro.freqmod(toggler * metro_tempo);
 
 		p.tick();
 		metro.tick();
@@ -136,9 +137,9 @@ void Audio::prepare()
 				discrep = fmin(discrep, abs(l + (double)i / out_chans - (double)j / n));
 
 			double entry = 1 - discrep;
-			double thresh = 0.875; // this controls how localized each source is
+			double thresh = (1 - 1.0 / (out_chans + 1)); // this controls how localized each source is
 
-			projection(i, j) = entry > thresh ? entry * entry : 0;
+			projection(i, (7 * j) % n) = entry > thresh ? entry * entry : 0;
 		}
 	}
 	projection.rowwise().normalize();
@@ -161,7 +162,8 @@ void Audio::prepare()
 		kernel.rowwise().normalize();
 	}
 
-	bool print_matrices = true;
+	mix = projection * kernel;
+	mix.colwise().normalize();
 
 	if (print_matrices)
 	{
@@ -169,43 +171,45 @@ void Audio::prepare()
 		for (int i = 0; i < n; i++)
 		{
 			for (int j = 0; j < n; j++)
-				std::cout << kernel(i,j) << " ";
+				std::cout << std::setprecision(5) << kernel(i,j) << "\t";
 			std::cout << std::endl;
 		}
 		std::cout << std::endl;
-	}
 
-	mix = projection * kernel;
-	mix.colwise().normalize();
+		std::cout << "projection:\n";
+		for (int i = 0; i < out_chans; i++)
+		{
+			for (int j = 0; j < n; j++)
+				std::cout << std::setprecision(5) << projection(i,j) << "\t";
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
 
-	if (print_matrices)
-	{
 		std::cout << "mix:\n";
 		for (int i = 0; i < out_chans; i++)
 		{
 			for (int j = 0; j < n; j++)
-				std::cout << mix(i,j) << " ";
+				std::cout << std::setprecision(5) << mix(i,j) << "\t";
 			std::cout << std::endl;
 		}
 	}
 
 	p.set_envelope(attack, decay);
 	p.set_ringing(ringing);
-}
 
-void Audio::graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius)
-{
-	ArrayT decays(n);
-	ArrayT ringings(n);
-
-	controller->set_decays(&decays, n);
-	controller->set_ringing(&ringings, n);
-
-	// p.mod_decay(&decays);
-	p.mod_ringing(&ringings);
-
-
-	p.graphics(window, screen_width, screen_height, draw_width, draw_height, radius, radius / 3);
+	notes = {10, 15, 26, 19, 29, 12};
+	std::vector<T> loader(n, 0);
+	chord.setZero();
+	pitches.setZero();
+	for (int a : notes)
+	{
+		loader[a % n] = a;
+		chord(a % n) = 1;
+		pitches(a % n) = a;
+	}
+	
+	p.set_notes(&chord, &pitches);
+	p.modulate();
 }
 
 void Audio::tempo(T scale)
@@ -216,11 +220,6 @@ void Audio::tempo(T scale)
 void Audio::toggle()
 {
 	toggler = !toggler;
-}
-
-void Audio::scope(RenderWindow* window)
-{
-	p.scope(window);
 }
 
 void Audio::args(int argc, char *argv[])
@@ -256,7 +255,7 @@ void Audio::args(int argc, char *argv[])
 		.help("device id for audio out");
 
 	program.add_argument("-of", "--out_framesize")
-		.default_value<int>(1)
+		.default_value<int>(2)
 		.required()
 		.scan<'i', int>()
 		.help("channels per frame of output");
@@ -332,10 +331,4 @@ void Audio::args(int argc, char *argv[])
 	{
 		std::exit(1);
 	}
-}
-
-
-void Audio::bind(Multitouch* controller)
-{
-	this->controller = controller;
 }

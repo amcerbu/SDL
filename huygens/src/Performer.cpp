@@ -84,13 +84,13 @@ Performer::Performer(int n, int overtones, int transp, T ringing, T attack, T de
 
 	ball_radii.resize(n);
 	ball_values.resize(n);
-	notes.resize(n);
-	octaves.resize(n);
+	voices.resize(n);
+	pitches.resize(n);
 
 	ball_radii.setZero();
 	ball_values.setZero();
-	notes.setZero();
-	octaves.setZero();
+	voices.setZero();
+	pitches.setZero();
 
 	modulate();
 }
@@ -100,14 +100,14 @@ Performer::~Performer()
 	delete out;
 }
 
-// expects indicator vector of notes and list of octave displacements
-void Performer::set_notes(const ArrayT* notes, const ArrayT* octaves)
+// expects indicator vector of voices and list of octave displacements
+void Performer::set_notes(const ArrayT* voices, const ArrayT* pitches)
 {
-	this->notes = *notes;
-	this->octaves = *octaves;
+	this->voices = *voices;
+	this->pitches = *pitches;
 }
 
-// modulate all notes
+// modulate all voices
 void Performer::modulate()
 {
 	std::vector<CT> radii(n * overtones);
@@ -115,7 +115,7 @@ void Performer::modulate()
 	{
 		for (int j = 0; j < overtones; j++)
 		{
-			T freq = mtof(i + n * octaves(i) + transp) * (1 + j);
+			T freq = mtof(pitches(i) + transp) * (1 + j);
 			T theta = 2 * PI * freq / SR;
 			// T rad = relax(ringing(i) / freq, SR);
 			T rad = relax(ringing(i), SR);
@@ -163,27 +163,4 @@ void Performer::tick()
 {
 	excitation.tick();
 	slidebank.tick();
-}
-
-void Performer::graphics(RenderWindow* window, int screen_width, int screen_height, int draw_width, int draw_height, double radius, double growth)
-{
-	double smooth = relax(3.0 / 60, 60);
-	ball_radii = smooth * ball_radii + (1 - smooth) * notes;
-	ball_values = smooth * ball_values + (1 - smooth) * octaves;
-
-	for (int i = 0; i < n; i++)
-	{
-		double x = (screen_width / 2 + (1 + 0.25 * ball_values(i)) * draw_width / 4 * sin(2 * M_PI * (double) i / n));
-		double y = (screen_height / 2 - (1 + 0.25 * ball_values(i)) * draw_height / 4 * cos(2 * M_PI * (double) i / n));
-		Color color;
-		color.hsva((double)i / n, 2.0 / 3, 1.0 / 3 + 1.0 / 6 * ball_values(i), 0.75);
-
-		window->color(color);
-		window->circle(x, y, radius * ball_radii(i));
-	}
-}
-
-void Performer::scope(RenderWindow* window)
-{
-
 }

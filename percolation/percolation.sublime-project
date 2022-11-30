@@ -1,0 +1,30 @@
+{
+	"folders":
+	[
+		{
+			"path": "bin/..",
+			"file_exclude_patterns": ["*.sublime-project"]
+		},
+		{
+			"path": "../lib/",
+		}
+	],
+
+	"build_systems":
+	[
+		{
+			"name": "Run",
+			"working_dir": "${project_path}",
+			"cmd":" ./Percolation",
+			"selector": "source.c++",
+			"shell": true
+		},
+		{
+			"name": "Make & run",
+			"working_dir": "${project_path}",
+			"cmd": "make; ./Percolation",
+			"selector": "source.c++",
+			"shell": true
+		}
+	]
+}

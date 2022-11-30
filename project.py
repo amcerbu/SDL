@@ -25,8 +25,6 @@ def main():
 
 	makefile = f'target = {target}' + '''
 
-target = Procedural
-
 # grab system info
 uname_s := $(shell uname -s)
 uname_m := $(shell uname -m)

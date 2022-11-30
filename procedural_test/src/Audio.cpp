@@ -161,11 +161,10 @@ void Audio::prepare()
 		kernel.rowwise().normalize();
 	}
 
-	bool print_matrices = true;
+	bool print_matrices = false;
 
 	if (print_matrices)
 	{
-		std::cout << "convolution:\n";
 		for (int i = 0; i < n; i++)
 		{
 			for (int j = 0; j < n; j++)
@@ -180,7 +179,6 @@ void Audio::prepare()
 
 	if (print_matrices)
 	{
-		std::cout << "mix:\n";
 		for (int i = 0; i < out_chans; i++)
 		{
 			for (int j = 0; j < n; j++)

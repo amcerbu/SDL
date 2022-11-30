@@ -106,8 +106,8 @@ void Multitouch::tick(int screen_width, int screen_height, int width, int height
 		for (int i = 0; i < disks; i++)
 		{
 			// floaters[i].constrain(0.5 + 0.25 * sin(2 * M_PI * i / disks), 0.5 - 0.25 * cos(2 * M_PI * i / disks), -cos(2 * M_PI * i / disks), sin(2 * M_PI * i / disks), 0.01, 0, 1.0 / oversample);
-			floaters[i].constrain(0.5, 0.5, sin(2 * M_PI * i / disks), -cos(2 * M_PI * i / disks), 0.01, 0, 1.0 / oversample);
-			// floaters[i].radiate(0.5, 0.5, 0.25, 0.1, 1.0 / oversample);
+			// floaters[i].constrain(0.5, 0.5, sin(2 * M_PI * i / disks), -cos(2 * M_PI * i / disks), 0.01, 0, 1.0 / oversample);
+			floaters[i].radiate(0.5, 0.5, 0.25, 0.1, 1.0 / oversample);
 		}
 
 		for (int i = 0; i < disks; i++)

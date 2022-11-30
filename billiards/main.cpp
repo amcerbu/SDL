@@ -16,7 +16,8 @@ const double colormod = 32;
 
 SDL_Rect fill = { 0, 0, (int)(width * 2 * correction), (int)(height * 2 * correction) };
 
-SDL_BlendMode polyblend = SDL_BLENDMODE_ADD;
+SDL_BlendMode polyblend = 
+SDL_BLENDMODE_ADD;
 // SDL_ComposeCustomBlendMode(
 // 	SDL_BLENDFACTOR_SRC_ALPHA,
 // 	SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
@@ -303,7 +304,7 @@ int main(int argc, char* args[])
 	}
 
 	RenderWindow window("Billiards", width, height, highDPI); 
-	// window.blend(polyblend);
+	window.blend(polyblend);
 
 	init();
 
@@ -392,7 +393,7 @@ int main(int argc, char* args[])
 
 		if (checker)
 		{
-			// window.blend(SDL_BLENDMODE_BLEND);
+			window.blend(SDL_BLENDMODE_BLEND);
 			for (int l = 0; l < tiles; l++)
 			{
 				for (int k = 0; k < tiles; k++)
@@ -405,7 +406,7 @@ int main(int argc, char* args[])
 					window.rectangle(&fill);
 				}
 			}
-			// window.blend(polyblend);
+			window.blend(polyblend);
 		}
 
 

@@ -15,6 +15,7 @@
 const int width = 800;
 const int height = 800;
 const bool highDPI = true;
+const bool spiral = true;
 
 #define DARKNESS 255
 #define ALPHA 64
@@ -26,7 +27,8 @@ const bool highDPI = true;
 #define INCREMENT 1
 
 #define CHROMATIC 12
-#define OCTAVES 5
+#define OCTAVES 2
+#define PITCHES CHROMATIC * OCTAVES
 #define A0 21
 
 using namespace soundmath;
@@ -85,7 +87,7 @@ void args(int argc, char *argv[])
 
 
 const int waveSize = (SR / INCREMENT) / FRAMERATE;
-SDL_FPoint waveforms[2 * waveSize * CHROMATIC * OCTAVES];
+SDL_FPoint waveforms[2 * waveSize * PITCHES];
 int waveOrigin = 0;
 double gain = 5.0;
 double radius = 0.9; // 
@@ -100,28 +102,40 @@ int pitch = 24;
 // double filter_r = 0.9999;
 // double filter_r = 0.996;
 // int multiplicity = 3;
-double filter_r = 0.996;
-int multiplicity = 3;
-Oscbank<double, CHROMATIC * OCTAVES> oscbank;
-Slidebank<double, CHROMATIC * OCTAVES> slidebank;
-Modbank<double, CHROMATIC * OCTAVES> modulators; // modulation
+double filter_r = 0.999;
+int multiplicity = 1;
+Oscbank<double, PITCHES> oscbank;
+Slidebank<double, PITCHES> slidebank;
+Modbank<double, PITCHES> modulators; // modulation
 
-double xs[CHROMATIC * OCTAVES];
-double ys[CHROMATIC * OCTAVES];
-double rs[CHROMATIC * OCTAVES];
+double xs[PITCHES];
+double ys[PITCHES];
+double rs[PITCHES];
 
 void init_graphics()
 {
-	for (int j = 0; j < CHROMATIC * OCTAVES; j++)
+	int across = 5; // sqrt(PITCHES);
+	int updown = PITCHES / across;
+
+	for (int j = 0; j < PITCHES; j++)
 	{
 		// rs[j] = (radius * pow(ratio, (double)j / CHROMATIC)); // logarithmic spiral
 		// rs[j] = (radius * pow(ratio, j / CHROMATIC)); // logarithmic spiral
-		rs[j] = radius * (1 - 1.0 / (OCTAVES) * ((double)j / CHROMATIC));
-		xs[j] = rs[j] * sin((2 * PI * j * 1) / CHROMATIC);
-		ys[j] = rs[j] * -cos((2 * PI * j * 1) / CHROMATIC);
+		if (spiral)
+		{
+			rs[j] = radius * (1 - 1.0 / (OCTAVES) * ((double)j / CHROMATIC));
+			xs[j] = rs[j] * sin((2 * PI * j * 1) / CHROMATIC);
+			ys[j] = rs[j] * -cos((2 * PI * j * 1) / CHROMATIC);
+		}
+		else
+		{
+			rs[j] = radius * (1 - 1.0 / (OCTAVES) * ((double)j / CHROMATIC));
+			xs[j] = 1.5 * ((double)(j % across)  / (across - 1) - 0.5);
+			ys[j] = 1.5 * ((double)(j / across) / (updown - 1) - 0.5);	
+		}
 	}
 
-	for (int j = 0; j < CHROMATIC * OCTAVES; j++)
+	for (int j = 0; j < PITCHES; j++)
 	{
 		double x = ((xs[j] + 1) / 2) * width * (1 + highDPI); 
 		double y = ((ys[j] + 1) / 2) * height * (1 + highDPI);
@@ -142,7 +156,7 @@ inline int process(const float* in, float* out)
 
 		// slidebank(modulators(offset + sign * sqrt(normalized), oscbank())); // for shapes!
 		slidebank(modulators(offset + the_sample, oscbank()));
-		for (int j = 0; j < CHROMATIC * OCTAVES; j++)
+		for (int j = 0; j < PITCHES; j++)
 		{
 			// std::complex<double> point = (*slidebank())(j) * (*oscbank())(j); // gives circles
 			std::complex<double> point = (*slidebank())(j) * (1.0 + (*oscbank())(j)); // gives spinning circles
@@ -174,7 +188,7 @@ inline int process(const float* in, float* out)
 
 void coefficients(int base)
 {
-	for (int j = 0; j < CHROMATIC * OCTAVES; j++)
+	for (int j = 0; j < PITCHES; j++)
 	{
 		oscbank.freqmod(j, 55 * pow(2, ((double)(base + j - A0)) / CHROMATIC));
 	}
@@ -195,7 +209,7 @@ int main(int argc, char* argv[])
 
 	RenderWindow window("Tuner", width, height, highDPI); 
 
-	slidebank.setup(multiplicity, std::vector<std::complex<double>>(CHROMATIC * OCTAVES, filter_r));
+	slidebank.setup(multiplicity, std::vector<std::complex<double>>(PITCHES, filter_r));
 	oscbank.open();
 	slidebank.open();
 
@@ -242,19 +256,19 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		// static SDL_Rect my_rect { 0, 0, width * (1 + highDPI), height * (1 + highDPI) };
-		window.color(1, 1, 1);
+		while (!ready)
+		{
+			usleep(10);
+		}
+
+		static SDL_Rect my_rect { 0, 0, width * (1 + highDPI), height * (1 + highDPI) };
+		window.color(1, 1, 1, 0.3);
 		// window.rectangle(&my_rect);
 
 		window.clear();
 
-		while (!ready)
-		{
-			usleep(100);
-		}
-
-		window.color(0, 0, 0, 0.5);
-		for (int j = 0; j < CHROMATIC * OCTAVES; j++)
+		window.color(0, 0, 0, 0.9);
+		for (int j = 0; j < PITCHES; j++)
 		{
 			window.curve(waveforms + 2 * waveSize * j + waveSize * (!flipped), waveSize);
 		}

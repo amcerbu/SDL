@@ -14,10 +14,10 @@
 
 // using namespace soundmath;
 
-const bool highDPI = false;
+const bool highDPI = true;
 bool fullscreen = false;
 const double correction = (highDPI ? 2 : 1);
-const bool audio = true;
+const bool audio = false;
 
 const int width = 800;
 const int height = 800;

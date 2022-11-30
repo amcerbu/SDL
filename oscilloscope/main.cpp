@@ -15,9 +15,9 @@ int screen_width;
 int screen_height;
 const int width = 800;
 const int height = 800;
-const bool highDPI = true;
+const bool highDPI = false;
 const double correction = (highDPI ? 1 : 0.5);
-bool fullscreen = true;
+bool fullscreen = false;
 bool mouse = false;
 
 #define DARKNESS 255
@@ -327,7 +327,7 @@ int main(int argc, char* argv[])
 		// window.blend(polyblend);
 		window.color(0, 0, 0, 0);
 		window.rectangle(&fillRect);
-		window.geometry(trackverts + waveSize * (!flipped) * 6, waveSize * 6);
+		// window.geometry(trackverts + waveSize * (!flipped) * 6, waveSize * 6);
 		// window.blend(SDL_BLENDMODE_BLEND);
 
 		window.color(1, 1, 1, 0.5);

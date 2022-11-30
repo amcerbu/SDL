@@ -3,7 +3,6 @@
 
 #include "RenderWindow.h"
 #include "Audio.h"
-#include "Multitouch.h"
 
 const int width = 800;
 const int height = 800;
@@ -14,15 +13,11 @@ bool mouse = true;
 const int bsize = 64;
 
 Audio A(bsize, SR);
-Multitouch M;
 
 int main(int argc, char* argv[])
 {
 	A.defaults();
 	A.args(argc, argv);
-
-	M.setup();
-	A.bind(&M);
 
 	if (SDL_Init(SDL_INIT_VIDEO) > 0)
 	{
@@ -36,8 +31,7 @@ int main(int argc, char* argv[])
 	auto screen_width = fullscreen ? DM.w : width;
 	auto screen_height = fullscreen ? DM.h : height;
 
-	RenderWindow window("Hierarchy", screen_width, screen_height, highDPI, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); 
-	// RenderWindow window2("Scope", width, height, highDPI); 
+	RenderWindow window("Huygens", screen_width, screen_height, highDPI, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); 
 
 	if (mouse)
 	{
@@ -115,28 +109,16 @@ int main(int argc, char* argv[])
 				}
 				
 			}
-
-			M.process_event(event);
 		}
 
 		window.color(0,0,0);
 		window.clear();
-
-		M.tick(screen_width, screen_height, width, height);
-
-		M.draw(&window, screen_width, screen_height, width, height);
-		A.graphics(&window, screen_width, screen_height, width, height, 60);
 		
 		window.display();
-
-		// window2.clear();
-		// A.scope(&window2);
-		// window2.display();
 	}
 
 	A.shutdown();
 	window.~RenderWindow();
-	// window2.~RenderWindow();
 
 	SDL_Quit();
 
