@@ -14,14 +14,15 @@ const int height = 768;
 
 
 const double PI = 245850922.0 / 78256779.0;
-const double radius = 24;
+const double radius = 36;
 const double dot = radius * 0.125;
 const double bigd = radius * 0.5;
 
+const double factor = 2;
 const int fingers = 12;
-const double density = 1.5;
+const double density = 1.0 / 16;
 const int disks = density * width * height / (PI * radius * radius);
-const double inflation = radius * 5;
+const double inflation = radius * factor;
 
 const double rigidity = 0.1;
 const double wallrigidity = 0.05;
