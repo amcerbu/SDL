@@ -1,52 +1,11 @@
-todo:
+Description of Performer class:
 
-1. restructure performer class. needs:
-x  a. twelve-voice polyphony; some number of one-pole (complex)
-      filters per voice, in harmonic (inharmonic?) series.
-      ideally, handled by a highly optimized eigen-based object
-      (benchmark: we could run filterbank with 1000 one-pole filters
-      no sweat. there's no reason this thing shouldn't be able to
-      handle 12 * 7 concurrently).
-x  b. support for control-rate modulation of center frequencies
-      of these filters. 
-x  c. adjust gain of resonant filters so high != loud. 
-   d. idea: "snap" button which pulls currently selected
-      pitches into just tuning, then all other pitches into something rel them.
-      "unsnap" button which allows reversion to equal temperament.
+A Performer is a polyphonic subtractive synth. Methods:
 
-2. interface for modifying pitch-class sets / hierarchies
-   a. defining a hierarchy from scratch: adding and removing pitches,
-      swapping out one pitch or multiple pitches. 
-   b. changing subgroupings of pitches (maybe this is how rhythm enters the picture).
-   c. all this needs to be on a propose / confirm system.
-   d. saving and restoring hierarchy presets.
-   e. events that change the pitch collection (but not shape) may take place at any time,
-      but events that change shape must take place on a structural downbeat.
+set_notes(voices, pitches)
+ - voices is an indicator vector of which voices are active
+ - pitches is a parallel array whose entries are (midi domain)
 
-3. interface for timbral modifications
-~  a. mixer via radial shape! (draw polygon with fingers; convex hull determines mix / timbral character)
-      i. perhaps it shouldn't be exactly 
-~  b. modification of impulse characteristics, filter characteristics
-   c. potential for drone?
-
-4. interface for rhythmic variation
-x  a. tempo changes (rudimentary)
-
-5. visual aesthetics
-   a. per-voice oscilloscopes instead of balls. the balls don't fit
-   b. 
-
-
-the timbral parameters worth modulating are basically: the resonances of the filters
-and the decay times.
-
-
-
-done:
-
-1. incremental progress to making idomatic (object-oriented) the audio library. e.g.,
-   converted audio class into an AbstractAudio base class from which one inherits
-   to define behavior
-2. progress on build system (e.g. automatic detection of m1 architecture)
-3. making slidebank modulable - jesus, that was a pain in the ass. wasted a lot of time
-   not seeing a silly bug. 
+impulse(input) 
+ - input is a (polyphonic) excitation signal; expected to be 
+   metro() * voices.

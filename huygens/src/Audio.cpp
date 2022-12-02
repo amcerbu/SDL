@@ -32,6 +32,7 @@ Performer p(n, overtones, transp, def_ringing, def_attack, def_decay, darkness, 
 bool toggler = true;
 double metro_tempo = 1;
 Metro<double> metro(toggler * metro_tempo); 
+Metro<double> lfoer(10);
 Noise<double> noise;
 Score score("score1.txt");
 std::vector<int> notes;
@@ -79,22 +80,16 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 {
 	for (int i = 0; i < frames; i++)
 	{
-		if (metro())
+		chord.setZero();
+		pitches.setZero();
+		for (int a : notes)
 		{
-			// notes = score.read();
+			chord(a % n) = 1;
+			pitches(a % n) = a + 0.5 * lfo();
 		}
-			std::vector<T> loader(n, 0);
-			chord.setZero();
-			pitches.setZero();
-			for (int a : notes)
-			{
-				loader[a % n] = a;
-				chord(a % n) = 1;
-				pitches(a % n) = a + 0.25 * lfo();
-			}
-
-		if (false)
-		{
+		
+		if (lfoer())
+		{	
 			p.set_notes(&chord, &pitches);
 			p.modulate();
 		}
@@ -118,6 +113,7 @@ int Audio::process(const float* in, float* out, unsigned long frames)
 		p.tick();
 		metro.tick();
 		lfo.tick();
+		lfoer.tick();
 		noise.tick();
 	}
 
@@ -198,12 +194,10 @@ void Audio::prepare()
 	p.set_ringing(ringing);
 
 	notes = {10, 15, 26, 19, 29, 12};
-	std::vector<T> loader(n, 0);
 	chord.setZero();
 	pitches.setZero();
 	for (int a : notes)
 	{
-		loader[a % n] = a;
 		chord(a % n) = 1;
 		pitches(a % n) = a;
 	}

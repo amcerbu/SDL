@@ -15,10 +15,10 @@ int screen_width;
 int screen_height;
 const int width = 800;
 const int height = 800;
-const bool highDPI = false;
+const bool highDPI = true;
 const double correction = (highDPI ? 1 : 0.5);
 bool fullscreen = false;
-bool mouse = false;
+bool mouse = true;
 
 #define DARKNESS 255
 #define ALPHA 64
