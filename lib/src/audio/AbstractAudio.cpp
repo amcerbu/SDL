@@ -79,7 +79,7 @@ void AbstractAudio::args(int argc, char *argv[])
 		.help("device id for audio in");
 
 	program.add_argument("-if", "--in_framesize")
-		.default_value<int>(1)
+		.default_value<int>(2)
 		.required()
 		.scan<'i', int>()
 		.help("channels per frame of input");
@@ -97,7 +97,7 @@ void AbstractAudio::args(int argc, char *argv[])
 		.help("device id for audio out");
 
 	program.add_argument("-of", "--out_framesize")
-		.default_value<int>(1)
+		.default_value<int>(2)
 		.required()
 		.scan<'i', int>()
 		.help("channels per frame of output");

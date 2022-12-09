@@ -28,7 +28,7 @@ const double spacing = radius / 4; // spacing of parallel curves
 
 const bool tied = false;
 
-const double ratio = 1; // what proportion of a full curve to render (may take values over 1)
+const double ratio = 0.75; // what proportion of a full curve to render (may take values over 1)
 const bool closed = ratio == 1;
 const double alpha = 0.85; // alpha of core curve
 const double circlealpha = sqrt(alpha);
@@ -66,7 +66,7 @@ SDL_BlendMode polyblend;
 // gives coordinates to point
 void f(double angle, SDL_FPoint* point)
 {
-	const bool wiggly = true;
+	const bool wiggly = false;
 	point->x = (float)( width * correction + (radius / 2 + wiggly * 0.1 * radius / 4 * cos(mod + sin(mod * angle))) * cos(angle) + sin(mod / 5) * 0.5 * radius / 2 * sin(3 * angle));
 	point->y = (float)(height * correction + (radius / 2 + wiggly * 0.1 * radius / 4 * sin(mod + cos(mod * angle))) * sin(angle) + cos(mod / 6) * 0.5 * radius / 2 * cos(5 * angle));
 }
