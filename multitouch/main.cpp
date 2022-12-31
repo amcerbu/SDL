@@ -9,16 +9,16 @@
 const bool highDPI = true;
 const double correction = (highDPI ? 2 : 1);
 
-const int width = 768;
-const int height = 768;
+const int width = 1200;
+const int height = 1200;
 
 
 const double PI = 245850922.0 / 78256779.0;
-const double radius = 24;
+const double radius = 18;
 const double dot = radius * 0.125;
 const double bigd = radius * 0.5;
 
-const double factor = 5;
+const double factor = 10;
 const int fingers = 12;
 const double density = 1.5; // 1.0 / 16;
 const int disks = density * width * height / (PI * radius * radius);
@@ -38,8 +38,8 @@ const double excitedsat = 2.0 / 3; // 0.0 / 3;
 
 const double alpha = 1; // 2.0 / 3;
 
-const double friction = 0.9;
-const int oversample = 8;
+const double friction = 0.95;
+const int oversample = 1;
 
 
 Disk grabbers[fingers];

@@ -6,17 +6,19 @@
 #include "audio.h"
 
 // const double PI = 245850922.0 / 78256779.0;
-const int width = 800;
-const int height = 800;
+const int width = 1200;
+const int height = 1200;
+int screen_width = width;
+int screen_height = height;
 const bool highDPI = true;
 const double correction = (highDPI ? 1 : 0.5);
-const double radius = correction * 0.75 * std::min(width, height);
+double radius = correction * 0.75 * std::min(screen_width, screen_height);
 
-const int count = 800; // 512; // segments on path
+const int count = 1024; // 512; // segments on path
 const double smooth = 256; // 64;
 const int skip = 128; // segments on path
 const int resolution = 32; // segments on circular caps
-const bool capped = false; // display line segment caps?
+const bool capped = true; // display line segment caps?
 const bool circled = false; // display semicircular caps?
 const bool core = false; // display core curve?
 const bool pairs = false; // display many segments?
@@ -40,6 +42,8 @@ const double b = 1;
 
 const bool geometry = true;
 const bool disks = false;
+bool fullscreen = false;
+bool mouse = false;
 
 double mod = 0;
 double modfreq = 1; // 1.5 * 0.75; // 0.75;
@@ -67,8 +71,8 @@ SDL_BlendMode polyblend;
 void f(double angle, SDL_FPoint* point)
 {
 	const bool wiggly = false;
-	point->x = (float)( width * correction + (radius / 2 + wiggly * 0.1 * radius / 4 * cos(mod + sin(mod * angle))) * cos(angle) + sin(mod / 5) * 0.5 * radius / 2 * sin(3 * angle));
-	point->y = (float)(height * correction + (radius / 2 + wiggly * 0.1 * radius / 4 * sin(mod + cos(mod * angle))) * sin(angle) + cos(mod / 6) * 0.5 * radius / 2 * cos(5 * angle));
+	point->x = (float)( screen_width * correction + (radius / 2 + wiggly * 0.1 * radius / 4 * cos(mod + sin(mod * angle))) * cos(angle) + sin(mod / 5) * 0.5 * radius / 2 * sin(3 * angle));
+	point->y = (float)(screen_height * correction + (radius / 2 + wiggly * 0.1 * radius / 4 * sin(mod + cos(mod * angle))) * sin(angle) + cos(mod / 6) * 0.5 * radius / 2 * cos(5 * angle));
 }
 
 enum Smoothing 
@@ -150,9 +154,9 @@ void move(SDL_FPoint* in, SDL_FPoint* out, SDL_FPoint* normals, double push, int
 
 using namespace soundmath;
 
-const int bsize = 64;
-inline int process(const float* in, float* out);
-Audio A = Audio(process, bsize);
+// const int bsize = 64;
+// inline int process(const float* in, float* out);
+// Audio A = Audio(process, bsize);
 
 int main(int argc, char* args[])
 {
@@ -192,7 +196,20 @@ int main(int argc, char* args[])
 		move(points, offsets + (2 * i + 1) * count, normals, -spacing * (1 + i), count);
 	}
 
-	RenderWindow window("Calligraphy", width, height, highDPI); 
+	SDL_DisplayMode DM;
+	SDL_GetCurrentDisplayMode(0, &DM);
+	screen_width = fullscreen ? DM.w : width;
+	screen_height = fullscreen ? DM.h : height;
+
+	if (mouse)
+	{
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+	}
+	else
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+
+
+	RenderWindow window("Calligraphy", screen_width, screen_height, highDPI, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); 
 
 	bool running = true;
 	SDL_Event event;
@@ -218,6 +235,33 @@ int main(int argc, char* args[])
 				{
 					mod += (double)count / 32;
 				}
+
+				if (event.key.keysym.sym == SDLK_f)
+				{
+					fullscreen = !fullscreen;
+					if (fullscreen)
+						SDL_SetWindowFullscreen(window.sdl_window(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+					else
+						SDL_SetWindowFullscreen(window.sdl_window(), 0);
+
+					SDL_GetCurrentDisplayMode(0, &DM);
+
+					screen_width = fullscreen ? DM.w : width;
+					screen_height = fullscreen ? DM.h : height;
+					radius = correction * 0.75 * std::min(screen_width, screen_height);
+				}
+
+				if (event.key.keysym.sym == SDLK_m)
+				{
+					mouse = !mouse;
+					if (mouse)
+					{
+						SDL_SetRelativeMouseMode(SDL_FALSE);
+					}
+					else
+						SDL_SetRelativeMouseMode(SDL_TRUE);
+				}
+
 			}
 		}
 
@@ -474,10 +518,10 @@ int main(int argc, char* args[])
 	return 0;
 }
 
-inline int process(const float* in, float* out)
-{
-	for (int i = 0; i < bsize; i++)
-	{
+// inline int process(const float* in, float* out)
+// {
+// 	for (int i = 0; i < bsize; i++)
+// 	{
 		
-	}
-}
+// 	}
+// }

@@ -27,7 +27,7 @@ SDL_BLENDMODE_ADD;
 // 	SDL_BLENDOPERATION_MINIMUM);
 
 const int oversample = 1024;
-const number stiffness = 4;
+const number stiffness = 0.1;
 const bool rigid = false;
 
 const number radius = width / 6;
@@ -86,8 +86,8 @@ void init()
 
 			x_centers[index] = radius / (2 * overlap) + radius * i / overlap;
 			y_centers[index] = radius / (2 * overlap) + radius * j / overlap;
-			x_vels[index] = (y_balls - 1 - j) * radius / 64;
-			y_vels[index] = i * radius / 64;
+			x_vels[index] = (y_balls - 1 - j) * radius / 128;
+			y_vels[index] = i * radius / 128;
 
 			x_avg += x_vels[index];
 			y_avg += y_vels[index];

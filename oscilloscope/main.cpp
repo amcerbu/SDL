@@ -26,7 +26,7 @@ bool mouse = true;
 #define LIGHTNESS 0
 
 #define BSIZE 64
-#define FRAMERATE 60
+#define FRAMERATE 120
 #define INCREMENT 1
 
 #define CHROMATIC 12
@@ -327,7 +327,7 @@ int main(int argc, char* argv[])
 		// window.blend(polyblend);
 		window.color(0, 0, 0, 0);
 		window.rectangle(&fillRect);
-		// window.geometry(trackverts + waveSize * (!flipped) * 6, waveSize * 6);
+		window.geometry(trackverts + waveSize * (!flipped) * 6, waveSize * 6);
 		// window.blend(SDL_BLENDMODE_BLEND);
 
 		window.color(1, 1, 1, 0.5);

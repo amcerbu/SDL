@@ -12,8 +12,8 @@
 #include "mixer.h"
 #include "argparse.h"
 
-const int width = 800;
-const int height = 800;
+const int width = 1000;
+const int height = 1000;
 const bool highDPI = true;
 const bool spiral = true;
 
@@ -23,11 +23,11 @@ const bool spiral = true;
 #define LIGHTNESS 0
 
 #define BSIZE 64
-#define FRAMERATE 60
+#define FRAMERATE 120
 #define INCREMENT 1
 
 #define CHROMATIC 12
-#define OCTAVES 2
+#define OCTAVES 3
 #define PITCHES CHROMATIC * OCTAVES
 #define A0 21
 
