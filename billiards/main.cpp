@@ -27,7 +27,7 @@ SDL_BLENDMODE_ADD;
 // 	SDL_BLENDOPERATION_MINIMUM);
 
 const int oversample = 1024;
-const number stiffness = 0.1;
+const number stiffness = 0.5;
 const bool rigid = false;
 
 const number radius = width / 6;

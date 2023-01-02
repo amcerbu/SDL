@@ -23,7 +23,7 @@ const bool spiral = true;
 #define LIGHTNESS 0
 
 #define BSIZE 64
-#define FRAMERATE 120
+#define FRAMERATE 60
 #define INCREMENT 1
 
 #define CHROMATIC 12

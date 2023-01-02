@@ -14,16 +14,16 @@ const bool highDPI = true;
 const double correction = (highDPI ? 1 : 0.5);
 double radius = correction * 0.75 * std::min(screen_width, screen_height);
 
-const int count = 1024; // 512; // segments on path
+const int count = 2048; // 512; // segments on path
 const double smooth = 256; // 64;
 const int skip = 128; // segments on path
 const int resolution = 32; // segments on circular caps
-const bool capped = true; // display line segment caps?
+const bool capped = false; // display line segment caps?
 const bool circled = false; // display semicircular caps?
 const bool core = false; // display core curve?
 const bool pairs = false; // display many segments?
 
-const bool tracked = true;
+const bool tracked = false;
 const bool undulating = false;
 const int tracks = 1; // number of parallel curves (on each side)
 const double spacing = radius / 4; // spacing of parallel curves
@@ -50,7 +50,7 @@ double modfreq = 1; // 1.5 * 0.75; // 0.75;
 
 double phase = 0;
 double freq = 1.5 * 0.05; // rate at which oscillator completes revolution
-double framerate = 60;
+double framerate = 120;
 
 SDL_FPoint points[count];
 SDL_FPoint normals[count];
