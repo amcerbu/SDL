@@ -4,12 +4,12 @@
 
 // #define N 8192
 // #define N 16384
-#define N 32768
-// #define N 65536
+// #define N 32768
+#define N 65536
 // #define N 262144
-#define LAPS 2
+#define LAPS 4
 // #define LAPS 32
-#define THRESH 250 // Hz
+#define THRESH 275 // Hz
 
 const int thresh_index = (int)((double)THRESH * N / SR);
 bool to_cut;

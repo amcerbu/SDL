@@ -89,7 +89,7 @@ void args(int argc, char *argv[])
 const int waveSize = (SR / INCREMENT) / FRAMERATE;
 SDL_FPoint waveforms[2 * waveSize * PITCHES];
 int waveOrigin = 0;
-double gain = 5.0;
+double gain = 3.0;
 double radius = 0.9; // 
 double ratio = 0.75; // 
 double offset = 0.0;
@@ -100,10 +100,10 @@ bool flipped = false;
 int pitch = 24;
 
 // double filter_r = 0.9999;
-// double filter_r = 0.996;
-// int multiplicity = 3;
-double filter_r = 0.999;
-int multiplicity = 1;
+double filter_r = 0.99;
+int multiplicity = 3;
+// double filter_r = 0.999;
+// int multiplicity = 1;
 Oscbank<double, PITCHES> oscbank;
 Slidebank<double, PITCHES> slidebank;
 Modbank<double, PITCHES> modulators; // modulation
@@ -262,12 +262,16 @@ int main(int argc, char* argv[])
 		}
 
 		static SDL_Rect my_rect { 0, 0, width * (1 + highDPI), height * (1 + highDPI) };
-		window.color(1, 1, 1, 0.3);
+		// window.color(1, 1, 1, 0.3);
+		window.color(0, 0, 0, 0.9);
+		
 		// window.rectangle(&my_rect);
 
 		window.clear();
 
-		window.color(0, 0, 0, 0.9);
+		// window.color(0, 0, 0, 0.9);
+		window.color(1, 1, 1, 0.3);
+
 		for (int j = 0; j < PITCHES; j++)
 		{
 			window.curve(waveforms + 2 * waveSize * j + waveSize * (!flipped), waveSize);

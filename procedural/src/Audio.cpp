@@ -161,7 +161,7 @@ void Audio::prepare()
 		kernel.rowwise().normalize();
 	}
 
-	bool print_matrices = true;
+	bool print_matrices = false;
 
 	if (print_matrices)
 	{
