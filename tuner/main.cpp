@@ -12,8 +12,8 @@
 #include "mixer.h"
 #include "argparse.h"
 
-const int width = 1000;
-const int height = 1000;
+const int width = 1200;
+const int height = 1200;
 const bool highDPI = true;
 const bool spiral = true;
 
@@ -101,7 +101,7 @@ int pitch = 24;
 
 // double filter_r = 0.9999;
 double filter_r = 0.99;
-int multiplicity = 3;
+int multiplicity = 2;
 // double filter_r = 0.999;
 // int multiplicity = 1;
 Oscbank<double, PITCHES> oscbank;
@@ -114,7 +114,7 @@ double rs[PITCHES];
 
 void init_graphics()
 {
-	int across = 5; // sqrt(PITCHES);
+	int across = 12; // sqrt(PITCHES);
 	int updown = PITCHES / across;
 
 	for (int j = 0; j < PITCHES; j++)

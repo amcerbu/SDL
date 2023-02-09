@@ -5,7 +5,7 @@
 #include "filter.h"
 #include "noise.h"
 
-Metro<double> metronome(2); // 120 bpm
+Metro<double> metronome(2.25); // 120 bpm
 // Filter<double> filter({1,0,-1}, {0,-0.999});
 Filter<double> filter({1},{0,-0.999});
 Filter<double> filter2({0.1},{0,-0.9});

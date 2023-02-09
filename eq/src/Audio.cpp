@@ -4,8 +4,8 @@
 
 // #define N 8192
 // #define N 16384
-// #define N 32768
-#define N 65536
+#define N 32768
+// #define N 65536
 // #define N 262144
 #define LAPS 4
 // #define LAPS 32
